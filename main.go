@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/rockaut/g2z"
-	"hpe3par"
 )
 
 func main() {
