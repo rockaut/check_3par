@@ -50,6 +50,8 @@ services:
       ZBX_PASSIVE_ALLOW: 'true'
       ZBX_SERVER_HOST: ''
       ZBX_HOSTNAME: ${ZABBIXAGENTHOSTNAME}
+      ZBX_LOADMODULE: 'check_3par.so'
+      ZBX_DEBUGLEVEL: 4
     stdin_open: true
     volumes:
     - zabbix_agent_modules:/var/lib/zabbix/modules
