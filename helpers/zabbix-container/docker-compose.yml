@@ -1,0 +1,190 @@
+version: '2'
+volumes:
+  zabbix_mysql:
+  zabbix_snmptraps:
+  zabbix_agent_modules:
+  zabbix_agent_enc:
+  zabbix_agent_config:
+  zabbix_mibs:
+  zabbix_share_mibs:
+  zabbix_alertscripts:
+  zabbix_externalscripts:
+  zabbix_modules:
+  zabbix_enc:
+  zabbix_ssh_keys:
+  zabbix_ssl_certs:
+  zabbix_ssl_keys:
+  zabbix_ssl_ssl_ca:
+  zabbix_prod_etc:
+  zabbix_ssl_nginx:
+services:
+  agent:
+    privileged: true
+    image: zabbix/zabbix-agent:ubuntu-latest
+    hostname: ${ZABBIXAGENTHOSTNAME}
+    environment:
+      ZBX_ENABLEREMOTECOMMANDS: '1'
+      ZBX_LOGREMOTECOMMANDS: '0'
+      ZBX_STARTAGENTS: '3'
+      ZBX_METADATA: ''
+      ZBX_METADATAITEM: ''
+      ZBX_REFRESHACTIVECHECKS: '120'
+      ZBX_BUFFERSEND: '5'
+      ZBX_BUFFERSIZE: '100'
+      ZBX_MAXLINESPERSECOND: '20'
+      ZBX_UNSAFEUSERPARAMETERS: '0'
+            ZBX_TLSCONNECT: unencrypted
+      ZBX_TLSACCEPT: unencrypted
+      ZBX_TLSCAFILE: ''
+      ZBX_TLSCRLFILE: ''
+      ZBX_TLSSERVERCERTISSUER: ''
+      ZBX_TLSSERVERCERTSUBJECT: ''
+      ZBX_TLSCERTFILE: ''
+      ZBX_TLSKEYFILE: ''
+      ZBX_TLSPSKIDENTITY: ''
+      ZBX_TLSPSKFILE: ''
+      ZBX_TIMEOUT: '15'
+      ZBX_ACTIVESERVERS: ''
+      ZBX_ACTIVE_ALLOW: 'true'
+      ZBX_PASSIVESERVERS: ''
+      ZBX_PASSIVE_ALLOW: 'true'
+      ZBX_SERVER_HOST: ''
+      ZBX_HOSTNAME: ${ZABBIXAGENTHOSTNAME}
+    stdin_open: true
+    volumes:
+    - zabbix_agent_modules:/var/lib/zabbix/modules
+    - zabbix_agent_enc:/var/lib/zabbix/enc
+    - zabbix_agent_config:/etc/zabbix
+    tty: true
+    links:
+    - zabbix-server:zabbix-server
+    ports:
+    - 10050:10050/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringrole=primary,monitoringtype=full
+  java-gateway:
+    image: zabbix/zabbix-java-gateway:ubuntu-latest
+    tty: true
+    ports:
+    - 10052:10052/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
+  snmptraps:
+    image: zabbix/zabbix-snmptraps:ubuntu-latest
+    volumes:
+    - zabbix_snmptraps:/var/lib/zabbix/snmptraps:rw
+    - zabbix_mibs:/var/lib/zabbix/mibs:ro
+    - zabbix_share_mibs:/usr/share/snmp/mibs:ro
+    tty: true
+    ports:
+    - 162:162/udp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
+  mysql-server:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+    stdin_open: true
+    volumes:
+    - zabbix_mysql:/var/lib/mysql
+    tty: true
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
+  zabbix-server:
+    image: zabbix/zabbix-server-mysql:ubuntu-latest
+    environment:
+      DB_SERVER_HOST: mysql-server
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      ZBX_CACHESIZE: 64M
+      ZBX_CACHEUPDATEFREQUENCY: '60'
+      ZBX_ENABLE_SNMP_TRAPS: 'true'
+      ZBX_HISTORYCACHESIZE: 64M
+      ZBX_HISTORYINDEXCACHESIZE: 64M
+      ZBX_HOUSEKEEPINGFREQUENCY: '1'
+      ZBX_IPMIPOLLERS: '1'
+      ZBX_JAVAGATEWAY: java-gateway
+      ZBX_JAVAGATEWAYPORT: '10052'
+      ZBX_LOGSLOWQUERIES: '3000'
+      ZBX_MAXHOUSEKEEPERDELETE: '5000'
+      ZBX_PROXYCONFIGFREQUENCY: '600'
+      ZBX_PROXYDATAFREQUENCY: '60'
+      ZBX_SENDERFREQUENCY: '60'
+      ZBX_STARTDBSYNCERS: '4'
+      ZBX_STARTDISCOVERERS: '1'
+      ZBX_STARTESCALATORS: '2'
+      ZBX_STARTHTTPPOLLERS: '2'
+      ZBX_STARTJAVAPOLLERS: '0'
+      ZBX_STARTPINGERS: '2'
+      ZBX_STARTPOLLERS: '5'
+      ZBX_STARTPOLLERSUNREACHABLE: '2'
+      ZBX_STARTPROXYPOLLERS: '2'
+      ZBX_STARTTIMERS: '2'
+      ZBX_STARTTRAPPERS: '5'
+      ZBX_STARTVMWARECOLLECTORS: '2'
+      ZBX_TIMEOUT: '15'
+      ZBX_TRAPPERIMEOUT: '300'
+      ZBX_TRENDCACHESIZE: 64M
+      ZBX_UNAVAILABLEDELAY: '60'
+      ZBX_UNREACHABLEDELAY: '15'
+      ZBX_UNREACHABLEPERIOD: '45'
+      ZBX_VALUECACHESIZE: 128M
+      ZBX_VMWARECACHESIZE: 64M
+      ZBX_VMWAREFREQUENCY: '120'
+      ZBX_VMWAREPERFFREQUENCY: '120'
+      ZBX_VMWARETIMEOUT: '15'
+    devices:
+    - /dev/ttyS0:/dev/ttyS0:rwm
+    stdin_open: true
+    volumes:
+    - zabbix_alertscripts:/usr/lib/zabbix/alertscripts
+    - zabbix_externalscripts:/usr/lib/zabbix/externalscripts
+    - zabbix_modules:/var/lib/zabbix/modules
+    - zabbix_enc:/var/lib/zabbix/enc
+    - zabbix_ssh_keys:/var/lib/zabbix/ssh_keys
+    - zabbix_ssl_certs:/var/lib/zabbix/ssl/certs
+    - zabbix_ssl_keys:/var/lib/zabbix/ssl/keys
+    - zabbix_ssl_ssl_ca:/var/lib/zabbix/ssl/ssl_ca
+    - zabbix_prod_etc:/etc/zabbix
+    - zabbix_snmptraps:/var/lib/zabbix/snmptraps
+    - zabbix_mibs:/var/lib/zabbix/mibs
+    - zabbix_share_mibs:/usr/share/snmp/mibs
+    tty: true
+    links:
+    - mysql-server:mysql-server
+    - snmptraps:snmptraps
+    - java-gateway:java-gateway
+    ports:
+    - 10051:10051/tcp
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
+zabbix-web:
+    image: zabbix/zabbix-web-nginx-mysql:ubuntu-latest
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      TZ: ${TIMEZONE}
+    volumes:
+    - zabbix_ssl_nginx:/etc/ssl/nginx:ro
+    links:
+    - mysql-server:mysql-server
+    - zabbix-server:zabbix-server
+    ports:
+    - 80:80/tcp
+    - 443:443/tcp
+    user: root
+    labels:
+      io.rancher.container.pull_image: always
+      io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
