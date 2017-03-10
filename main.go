@@ -16,5 +16,5 @@ func Echo(request *g2z.AgentRequest) (string, error) {
 }
 
 func init() {
-	g2z.RegisterStringItem("go.echo", "Hello world!", Echo)
+	g2z.RegisterStringItem("hpe3par.echo", "Hello world!", Echo)
 }
