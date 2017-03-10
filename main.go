@@ -1,9 +1,11 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
+	"github.com/rockaut/g2z"
+	"hpe3par"
 )
 
 func main() {
-    fmt.Println("Say hello HPE 3Par")
+	fmt.Println("Say hello HPE 3Par")
 }
