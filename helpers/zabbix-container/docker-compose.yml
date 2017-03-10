@@ -132,6 +132,8 @@ services:
       ZBX_VMWAREFREQUENCY: '120'
       ZBX_VMWAREPERFFREQUENCY: '120'
       ZBX_VMWARETIMEOUT: '15'
+      ZBX_LOADMODULE: 'check_3par.so'
+      ZBX_DEBUGLEVEL: 4
     devices:
     - /dev/ttyS0:/dev/ttyS0:rwm
     stdin_open: true
