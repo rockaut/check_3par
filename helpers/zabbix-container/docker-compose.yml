@@ -168,7 +168,7 @@ services:
     labels:
       io.rancher.container.pull_image: always
       io.rancher.scheduler.affinity:host_label_soft: monitoringtype=full,monitoringrole=primary
-zabbix-web:
+  zabbix-web:
     image: zabbix/zabbix-web-nginx-mysql:ubuntu-latest
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
