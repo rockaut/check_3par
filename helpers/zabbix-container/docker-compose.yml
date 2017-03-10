@@ -33,7 +33,7 @@ services:
       ZBX_BUFFERSIZE: '100'
       ZBX_MAXLINESPERSECOND: '20'
       ZBX_UNSAFEUSERPARAMETERS: '0'
-            ZBX_TLSCONNECT: unencrypted
+      ZBX_TLSCONNECT: unencrypted
       ZBX_TLSACCEPT: unencrypted
       ZBX_TLSCAFILE: ''
       ZBX_TLSCRLFILE: ''
