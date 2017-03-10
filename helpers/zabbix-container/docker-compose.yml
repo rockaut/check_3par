@@ -50,7 +50,7 @@ services:
       ZBX_PASSIVE_ALLOW: 'true'
       ZBX_SERVER_HOST: 'zabbix-server'
       ZBX_HOSTNAME: ${ZABBIXAGENTHOSTNAME}
-      ZBX_LOADMODULE: 'check_3par.so'
+      ZBX_LOADMODULE: 'check_3par.so,dummy.so'
       ZBX_DEBUGLEVEL: ${DEBUG_LEVELS}
     stdin_open: true
     privileged: true
@@ -133,7 +133,7 @@ services:
       ZBX_VMWAREFREQUENCY: '120'
       ZBX_VMWAREPERFFREQUENCY: '120'
       ZBX_VMWARETIMEOUT: '15'
-      ZBX_LOADMODULE: 'check_3par.so'
+      ZBX_LOADMODULE: 'check_3par.so,dummy.so'
       ZBX_DEBUGLEVEL: ${DEBUG_LEVELS}
     devices:
     - /dev/ttyS0:/dev/ttyS0:rwm
