@@ -2,19 +2,14 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"os"
 
-	"github.com/rockaut/g2z"
+	"github.com/rockaut/check_3par/cmd"
 )
 
 func main() {
-	fmt.Println("Say hello HPE 3Par")
-}
-
-func Echo(request *g2z.AgentRequest) (string, error) {
-	return strings.Join(request.Params, " "), nil
-}
-
-func init() {
-	g2z.RegisterStringItem("hpe3par.echo", "Hello world!", Echo)
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
 }
